@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Safari Humanizer — by OsaProvidesHacks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --border: #1c1c2e;
+      --accent: #5b7fff;
+      --accent2: #a78bfa;
+      --text: #e2e2f0;
+      --muted: #555570;
+      --green: #34d399;
+    }
+
+    html { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ── GRID BG ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(91,127,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91,127,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── GLOW ── */
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-orb.one {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(91,127,255,0.12), transparent 70%);
+      top: -200px; left: -100px;
+      animation: drift1 12s ease-in-out infinite;
+    }
+    .glow-orb.two {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(167,139,250,0.08), transparent 70%);
+      bottom: -150px; right: -100px;
+      animation: drift2 15s ease-in-out infinite;
+    }
+    @keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
+    @keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-40px)} }
+
+    /* ── LAYOUT ── */
+    .container {
+      position: relative; z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: relative; z-index: 2;
+      padding: 24px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 18px; color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    .nav-logo span { color: var(--accent); font-style: italic; }
+    .nav-tag {
+      font-size: 11px; color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 100px 0 70px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(91,127,255,0.08);
+      border: 1px solid rgba(91,127,255,0.2);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 11px; color: var(--accent);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--green); border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    .hero h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(48px, 8vw, 80px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .hero h1 em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 15px; color: var(--muted);
+      line-height: 1.7; max-width: 480px;
+      margin: 0 auto 60px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── BOOKMARKLET BOX ── */
+    .bookmarklet-section {
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .bookmarklet-label {
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .bookmarklet-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .bookmarklet-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .bookmarklet-dots { display: flex; gap: 6px; }
+    .bookmarklet-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .bookmarklet-dots span:nth-child(1) { background: #ff5f57; }
+    .bookmarklet-dots span:nth-child(2) { background: #febc2e; }
+    .bookmarklet-dots span:nth-child(3) { background: #28c840; }
+    .bookmarklet-filename { font-size: 11px; color: var(--muted); }
+
+    .bookmarklet-code {
+      padding: 20px;
+      font-size: 12px;
+      color: #8899ff;
+      word-break: break-all;
+      line-height: 1.6;
+      user-select: all;
+      cursor: text;
+    }
+    .bookmarklet-code .kw { color: var(--accent2); }
+    .bookmarklet-code .str { color: var(--green); }
+
+    .btn-row {
+      display: flex; gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .btn {
+      flex: 1; padding: 11px;
+      border: none; border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px; font-weight: 500;
+      cursor: pointer; letter-spacing: 0.02em;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #6d8fff; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+    .copy-feedback {
+      font-size: 11px; color: var(--green);
+      text-align: center; margin-top: 10px;
+      height: 16px; transition: opacity 0.3s;
+      opacity: 0;
+    }
+    .copy-feedback.show { opacity: 1; }
+
+    /* ── HOW TO ── */
+    .how-section {
+      margin: 80px 0;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .section-label {
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .steps {
+      display: flex; flex-direction: column; gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .step {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 20px 22px;
+      background: var(--surface);
+      transition: background 0.15s;
+    }
+    .step:hover { background: rgba(91,127,255,0.04); }
+    .step + .step { border-top: 1px solid var(--border); }
+    .step-num {
+      font-size: 11px; color: var(--accent);
+      background: rgba(91,127,255,0.1);
+      border: 1px solid rgba(91,127,255,0.2);
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+      letter-spacing: 0;
+    }
+    .step-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+    .step-text strong { color: #fff; font-weight: 500; }
+    .step-text code {
+      background: rgba(91,127,255,0.1);
+      border: 1px solid rgba(91,127,255,0.2);
+      padding: 1px 6px; border-radius: 4px;
+      font-size: 11px; color: var(--accent);
+    }
+
+    /* ── FEATURES ── */
+    .features-section {
+      margin: 0 0 80px;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .feature {
+      padding: 22px;
+      background: var(--surface);
+      transition: background 0.15s;
+    }
+    .feature:hover { background: rgba(91,127,255,0.04); }
+    .feature-icon { font-size: 20px; margin-bottom: 10px; }
+    .feature-title { font-size: 13px; color: #fff; margin-bottom: 6px; font-weight: 500; }
+    .feature-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 70px 0 50px; }
+      .features-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="glow-orb one"></div>
+<div class="glow-orb two"></div>
+
+<div class="container">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">✍️ Safari <span>Humanizer</span></div>
+    <div class="nav-tag">v2.0 · Safari Only</div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">Free · No Install · Works in Safari</div>
+    <h1>Make AI text sound<br><em>human.</em></h1>
+    <p class="hero-sub">
+      A Safari bookmarklet that types humanized text directly into Google Docs —
+      with realistic speed, typos, and natural pacing.
+    </p>
+
+    <!-- BOOKMARKLET -->
+    <div class="bookmarklet-section">
+      <p class="bookmarklet-label">Your bookmarklet</p>
+      <div class="bookmarklet-box">
+        <div class="bookmarklet-header">
+          <div class="bookmarklet-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="bookmarklet-filename">safari-humanizer.js</div>
+          <div style="width:52px"></div>
+        </div>
+        <div class="bookmarklet-code" id="bookmarkletCode">
+          <span class="kw">javascript</span>:(<span class="kw">function</span>(){<span class="kw">const</span> s=document.createElement(<span class="str">'script'</span>);s.src=<span class="str">'https://gist.githubusercontent.com/OsaProvidesHacks/097f853dc53bb27d350268b6a63e3fe0/raw/safari-humanizer.js'</span>;document.head.appendChild(s);})();
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="copyBookmarklet()">Copy Bookmarklet</button>
+          <button class="btn btn-secondary" onclick="showRaw()">View Script</button>
+        </div>
+      </div>
+      <div class="copy-feedback" id="copyFeedback">✓ Copied to clipboard</div>
+    </div>
+  </section>
+
+  <!-- HOW TO -->
+  <section class="how-section">
+    <p class="section-label">How to install</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-text"><strong>Copy the bookmarklet</strong> above using the copy button</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-text">In Safari, bookmark any page with <code>⌘D</code></div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-text">Go to <strong>Bookmarks → Edit Bookmarks</strong>, click the URL field of the bookmark you just made</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-text">Delete the URL and <strong>paste the bookmarklet</strong>. Rename it <code>Humanizer</code></div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-text">Open a <strong>Google Doc</strong>, click inside it, then click your bookmark — the panel appears</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section">
+    <p class="section-label">What it does</p>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">⌨️</div>
+        <div class="feature-title">Realistic Typing</div>
+        <div class="feature-desc">Types character by character with variable speed and natural rhythm — not a paste dump.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✏️</div>
+        <div class="feature-title">Typo Simulation</div>
+        <div class="feature-desc">Occasionally makes a typo, pauses, backspaces, and corrects it — just like a real person.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📚</div>
+        <div class="feature-title">Grade-Level Vocab</div>
+        <div class="feature-desc">Swaps complex AI words for simpler ones based on 9th–12th grade reading level.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Contractions + Fillers</div>
+        <div class="feature-desc">Adds natural contractions and filler phrases so the text reads like a real student wrote it.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>Built by <a href="https://github.com/OsaProvidesHacks" target="_blank">OsaProvidesHacks</a></span>
+    <span>Safari only · Google Docs</span>
+  </footer>
+
+</div>
+
+<script>
+  function copyBookmarklet() {
+    const code = `javascript:(function(){const s=document.createElement('script');s.src='https://gist.githubusercontent.com/OsaProvidesHacks/097f853dc53bb27d350268b6a63e3fe0/raw/safari-humanizer.js';document.head.appendChild(s);})();`;
+    navigator.clipboard.writeText(code).then(() => {
+      const fb = document.getElementById('copyFeedback');
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2500);
+    });
+  }
+
+  function showRaw() {
+    window.open('https://gist.githubusercontent.com/OsaProvidesHacks/097f853dc53bb27d350268b6a63e3fe0/raw/safari-humanizer.js', '_blank');
+  }
+</script>
+
+</body>
+</html>
